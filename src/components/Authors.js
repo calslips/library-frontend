@@ -3,7 +3,7 @@ import Select from 'react-select'
 import { useQuery, useMutation } from '@apollo/client'
 import { ALL_AUTHORS, EDIT_AUTHOR } from '../queries'
 
-const Authors = (props) => {
+const Authors = ({ show, token }) => {
   const [selectedAuthor, setSelectedAuthor] = useState(null)
   const [born, setBorn] = useState('')
 
@@ -12,7 +12,7 @@ const Authors = (props) => {
     refetchQueries: [ALL_AUTHORS]
   })
 
-  if (!props.show) {
+  if (!show) {
     return null
   }
   if (result.loading) {
@@ -58,23 +58,27 @@ const Authors = (props) => {
           )}
         </tbody>
       </table>
-      <h2>Set birth year</h2>
-      <form onSubmit={updateAuthor}>
-        <div>
-          <Select
-            defaultValue={selectedAuthor}
-            onChange={setSelectedAuthor}
-            options={authorOptions}
-          />
-        </div>
-        <div>
-          born <input
-            value={born}
-            onChange={({ target }) => setBorn(target.value)}
-          />
-        </div>
-        <button type='submit'>update author</button>
-      </form>
+      {token &&
+      <div>
+        <h2>Set birth year</h2>
+        <form onSubmit={updateAuthor}>
+          <div>
+            <Select
+              defaultValue={selectedAuthor}
+              onChange={setSelectedAuthor}
+              options={authorOptions}
+            />
+          </div>
+          <div>
+            born <input
+              value={born}
+              onChange={({ target }) => setBorn(target.value)}
+            />
+          </div>
+          <button type='submit'>update author</button>
+        </form>
+      </div>
+      }
     </div>
   )
 }
