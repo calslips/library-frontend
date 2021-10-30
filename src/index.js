@@ -46,6 +46,11 @@ const query = gql`
       id
       genres
     }
+    me {
+      username
+      favoriteGenre
+      id
+    }
   }
 `
 
