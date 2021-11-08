@@ -4,7 +4,6 @@ import { USER, ALL_BOOKS } from '../queries'
 
 const Recommend = ({ show, token }) => {
   const [favoriteBooks, setFavoriteBooks] = useState([])
-  const [favoriteGenre, setFavoriteGenre] = useState('')
   const [getUser, userResult] = useLazyQuery(USER, {
     fetchPolicy: 'network-only'
   })
@@ -17,12 +16,16 @@ const Recommend = ({ show, token }) => {
   }, [token, getUser])
 
   useEffect(() => {
-    if (token && userResult.data) {
-      setFavoriteGenre(userResult.data.me.favoriteGenre)
-      getFavoriteBooks({ variables: { genre: favoriteGenre }})
-      favoriteBooksResult.data && setFavoriteBooks(favoriteBooksResult.data.allBooks)
+    try {
+      if (userResult.data) {
+        console.log(userResult.data)
+        getFavoriteBooks({ variables: { genre: userResult.data.me.favoriteGenre }})
+        favoriteBooksResult.data && setFavoriteBooks(favoriteBooksResult.data.allBooks)
+      }
+    } catch (error) {
+      console.log(error.message)
     }
-  }, [token, userResult.data, favoriteGenre, getFavoriteBooks, favoriteBooksResult.data])
+  }, [userResult.data, favoriteBooksResult.data]) // eslint-disable-line
 
   if (!show) {
     return null
@@ -34,7 +37,7 @@ const Recommend = ({ show, token }) => {
   return (
     <div>
       <h2>recommendations</h2>
-      <p>books in your favorite genre <strong>{favoriteGenre}</strong></p>
+      <p>books in your favorite genre <strong>{userResult.data.me.favoriteGenre}</strong></p>
       <table>
         <tbody>
           <tr>
