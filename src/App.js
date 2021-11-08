@@ -5,7 +5,7 @@ import Books from './components/Books'
 import NewBook from './components/NewBook'
 import LoginForm from './components/LoginForm'
 import Recommend from './components/Recommend'
-import { BOOK_ADDED } from './queries'
+import { BOOK_ADDED, ALL_BOOKS } from './queries'
 
 const App = () => {
   const [token, setToken] = useState(null)
@@ -16,14 +16,26 @@ const App = () => {
     setToken(localStorage.getItem('library-user-token'))
   }, [token])
 
+  const updateCache = (addedBook) => {
+    const containsAdded = (list, object) =>
+      list.map(b => b.id).includes(object.id)
+
+    const storeData = client.readQuery({ query: ALL_BOOKS })
+    if (!containsAdded(storeData.allBooks, addedBook)) {
+      client.writeQuery({
+        query: ALL_BOOKS,
+        data: { allBooks: storeData.allBooks.concat(addedBook) }
+      })
+    }
+  }
+
   useSubscription(BOOK_ADDED, {
     onSubscriptionData: ({ subscriptionData }) => {
-      console.log(subscriptionData)
-      let title = subscriptionData.data.bookAdded.title
-      let author = subscriptionData.data.bookAdded.author.name
+      let addedBook = subscriptionData.data.bookAdded
       window.alert(
-        `'${title}' by ${author} has been added`
+        `'${addedBook.title}' by ${addedBook.author.name} has been added`
       )
+      updateCache(addedBook)
     }
   })
 
