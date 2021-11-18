@@ -18,7 +18,6 @@ const Recommend = ({ show, token }) => {
   useEffect(() => {
     try {
       if (userResult.data) {
-        console.log(userResult.data)
         getFavoriteBooks({ variables: { genre: userResult.data.me.favoriteGenre }})
         favoriteBooksResult.data && setFavoriteBooks(favoriteBooksResult.data.allBooks)
       }
